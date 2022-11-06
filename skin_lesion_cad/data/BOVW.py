@@ -138,8 +138,18 @@ class DenseDescriptor:
         num_available = len(all_mask_points)
 
         if num <= num_available:
-            additional_kp = [cv2.KeyPoint(int(i[1]), int(
-                i[0]), size=self.kp_size) for i in random.sample(list(all_mask_points), num)]
+            if self.sample_method == "random":
+                additional_kp = [cv2.KeyPoint(int(i[1]), int(
+                    i[0]), size=self.kp_size) for i in random.sample(list(all_mask_points), num)]
+            elif self.sample_method == "gaussian":
+                scale = mask.shape[0]//8
+                range_x = mask.shape[0]//2
+                range_y = mask.shape[1]//2
+                
+                xs = truncnorm(a=-range_x/scale, b=+range_x/scale, scale=scale).rvs(size=num).round().astype(np.float32)
+                ys = truncnorm(a=-range_y/scale, b=+range_y/scale, scale=scale).rvs(size=num).round().astype(np.float32)
+
+                additional_kp = [cv2.KeyPoint(range_y + ys[i], range_x + xs[i], size=self.kp_size) for i in range(len(xs)) if mask[int(range_x + xs[i]), int(range_y + ys[i])] !=0]
         else:
             additional_kp = self._sample_keypoints(mask, num)
 

@@ -15,7 +15,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import balanced_accuracy_score, cohen_kappa_score
 from sklearn.svm import SVC
 
-classifiers = [(SVC(kernel='rbf', C=1, probability=True, class_weight='balanced'), 'full', 'svc_full'),
+classifiers = [(SVC(kernel='rbf', C=1, random_state=42, probability=True, class_weight='balanced'), 'full', 'svc_full'),
                (RandomForestClassifier(bootstrap=False, max_depth=10, class_weight='balanced'), 'smote', 'rf_smote'),
                (SVC(C=10, class_weight='balanced', gamma=0.1, probability=True), 'rf_fs', 'svc_rf_fs'),
                (RandomForestClassifier(bootstrap=False, max_depth=20, class_weight='balanced'), 'pca', 'rf_pca'),

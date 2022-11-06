@@ -149,7 +149,7 @@ class Segment:
         # dilate the mask to include neighboring black pixels
         black_mask = cv2.dilate(black_mask, cv2.getStructuringElement(cv2.MORPH_CROSS,
                                                                       (10, 10)),
-                                iterations=5)
+                                iterations=8)
         return black_mask
 
     @staticmethod
@@ -194,7 +194,7 @@ class Segment:
         # also smoothes the contours of segmentation
         return cv2.morphologyEx(image, cv2.MORPH_OPEN, se)
 
-    def segment(self, img, img_name, save=False, resize=None, overrite=False):
+    def segment(self, img, img_name, save=False, resize=1, overrite=False):
         """
         Segment segment the lesion image
 
@@ -224,7 +224,6 @@ class Segment:
         if not overrite and save_path.exists() and save_path_inp.exists():
             return cv2.imread(str(save_path), cv2.IMREAD_GRAYSCALE),\
                    cv2.imread(str(save_path_inp), cv2.IMREAD_GRAYSCALE)
-        
 
         # extract FOV mask to ignore it for segmentation
         fov = Segment.fov_mask(img)
@@ -284,10 +283,12 @@ class Segment:
             scale_str = 1 if resize is None else str(resize).replace('.', '_')
             save_path = save_dir/Path(img_name.stem+f"_mask_{scale_str}.png")
             save_path_inp = save_dir/Path(img_name.stem+f"_inpaint_{scale_str}.png")
-            
+            save_path_fov = save_dir/Path(img_name.stem+f"_fov_{scale_str}.png")
+
             cv2.imwrite(str(save_path), cv2.resize(output, (0, 0),
                                                    fx=resize, fy=resize))
             cv2.imwrite(str(save_path_inp), cv2.resize(img, (0, 0),
                                                        fx=resize, fy=resize))
-
+            cv2.imwrite(str(save_path_fov), cv2.resize(fov, (0, 0),
+                                                       fx=resize, fy=resize))
         return output, img

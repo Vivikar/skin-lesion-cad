@@ -14,7 +14,7 @@ parser = argparse.ArgumentParser(description='Path to raw data to process from d
 parser.add_argument('path', metavar='p', type=str,
                     help='Path to raw data to process from data/raw. For example chall1/train/nevus')
 
-parser.add_argument('--resize', metavar='r', type=float,
+parser.add_argument('--resize', metavar='r', type=float, default=1,
                     help='Resize factor for images. For example 0.5')
 args = parser.parse_args()
 process_path = args.path
