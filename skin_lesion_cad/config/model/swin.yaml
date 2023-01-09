@@ -1,4 +1,4 @@
 _target_: skin_lesion_cad.training.models.swin.SwinModel
 num_classes: 2
 weights: 'IMAGENET1K_V1'
-model_class: 'swin_v2_b'
+model_class: 'swin_v2_t'

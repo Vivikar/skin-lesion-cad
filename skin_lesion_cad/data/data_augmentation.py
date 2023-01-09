@@ -142,6 +142,35 @@ def policy_v1_1(probability=0.7, magnitude=5):
     return policy
 
 
+def policy_v1_1_our(probability=0.7, magnitude=5):
+    """ Randomly select one transformation from {color} transformations,
+        and then randomly select one transformation from {shape} transformations."""
+    policy = {
+        # color augment
+        0: [[('Mixup', probability, magnitude)], [('Vignetting', probability, magnitude)], [('Gaussian_noise', probability, magnitude)],
+            [('Saturation', probability, magnitude)], [
+            ('Contrast', probability, magnitude)], [('Brightness', probability, magnitude)],
+            [('Sharpness', probability, magnitude)], [('Color_casting',
+                                                       probability, magnitude)],
+                                                    #    , [('Equalize_YUV', probability, magnitude)],
+            # [('SolarizeAdd', probability, magnitude)],
+            [('Posterize', probability, magnitude)], [
+            ('AutoContrast', probability, magnitude)],
+            # [('Solarize', probability, magnitude)],
+            #  [('Equalize', probability, magnitude)]
+            ],
+        # shape augment
+        1: [[('Rotate', probability, magnitude)], [('Lens_distortion', probability, magnitude)],
+            [('Flip', probability, magnitude)], [
+            ('Cutout', probability, magnitude)],
+            [('Shear_x', probability, magnitude)], [
+            ('Shear_y', probability, magnitude)],
+            [('Scale', probability, magnitude)], [('Scale_xy_diff', probability, magnitude)]]
+    }
+    return policy
+
+
+
 def policy_v2_0(probability=0.7, magnitude=5):
     """ Randomly select three transformations from all transformations"""
     policy = {
@@ -1225,6 +1254,7 @@ def distort_image_with_modified_randaugment(image, augmentation_name, image_bg, 
                           'v1_0': policy_v1_0, 'v1_1': policy_v1_1,
                           'v2_0': policy_v2_0, 'v2_1': policy_v2_1, 'v2_2': policy_v2_2,
                           'v3_0': policy_v3_0, 'v3_1': policy_v3_1,
+                          'v1_1_our': policy_v1_1_our
                           }
     if augmentation_name not in available_policies:
         raise ValueError(

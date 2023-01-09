@@ -23,7 +23,7 @@ cfg:
     COLOR_CONSTANCY: False
     AUGMENT:
       NEED_AUGMENT: True
-      AUG_METHOD: 'v1_1'
+      AUG_METHOD: 'v2_2'
       AUG_PROB: 0.7
       AUG_MAG: 10
       AUG_LAYER_NUM: 2
