@@ -26,6 +26,8 @@ def worker_init_fn(worker_id):
 
 class MelanomaDataset(Dataset):
     def __init__(self, base_dir=None, split='train', chall="chall2", num=None, cfg=None):
+        if type(base_dir)==str:
+            base_dir = Path(base_dir)
         self._base_dir = base_dir/Path(chall)
         self.sample_list = []
         self.split = split
@@ -45,7 +47,7 @@ class MelanomaDataset(Dataset):
 
         elif self.split == 'predict':
             self.sample_list = list(
-                (self._base_dir/Path("testX")).rglob("*.jpg"))
+                (self._base_dir/Path("test")).rglob("*.jpg"))
 
         if num is not None and self.split == "train":
             self.sample_list = self.sample_list[:num]
@@ -88,9 +90,9 @@ class MelanomaDataset(Dataset):
     def __getitem__(self, idx):
         case = self.sample_list[idx]
         image = self._get_image(case)
-        label = self.get_class(str(case.parent.stem))
         image = self.image_transform(image, idx)
         if self.split != "predict":
+            label = self.get_class(str(case.parent.stem))
             sample = {'image': image, 'label': torch.tensor(label),
                       'name': case.stem}
         else:
@@ -338,7 +340,6 @@ class MelanonaDatasetSimple(MelanomaDataset):
 class MelanomaDataModule(LightningDataModule):
     def __init__(self, cfg):
         super().__init__()
-        
         if cfg.dataloader == 'simple':
             self.DataSet = MelanonaDatasetSimple
         else:
@@ -353,9 +354,9 @@ class MelanomaDataModule(LightningDataModule):
             logger.info(
                 f'len of train examples {len(self.train_dataset)}, len of val examples {len(self.val_dataset)}'
             )
-        else:
+        # else:
             self.test_dataset = self.DataSet(
-                cfg.data_dir, split="test", chall=cfg.chall, cfg=cfg)
+                cfg.data_dir, split="predict", chall=cfg.chall, cfg=cfg)
             logger.info(f'len of test examples {len(self.test_dataset)}')
 
     def train_dataloader(self):
