@@ -23,11 +23,21 @@ def gen_test_results(cfg: DictConfig):
     trainer = Trainer(accelerator='gpu')
 
     model = model_cls.load_from_checkpoint(checkpoint_path=hydra_logpath /checkpoint_path)
-    res_val = trainer.predict(model=model, dataloaders=melanoma_data_module.test_dataloader())
-    img = [j for i in res_val for j in i[0]]
-    pred = [j for i in res_val for j in i[1]]
-    pd.DataFrame({"image":img,f"{HydraConfig.get().job.name}_pred":pred}).to_csv(hydra_logpath/"prediction.csv")
-    print(f"Prediction saved to: {hydra_logpath/'prediction.csv'}")
+    
+    
+    # res_val = trainer.predict(model=model, dataloaders=melanoma_data_module.val_dataloader())
+    # img = [j for i in res_val for j in i[0]]
+    # pred = [j for i in res_val for j in i[1]]
+    # pd.DataFrame({"image":img,f"{HydraConfig.get().job.name}_pred":pred}).to_csv(hydra_logpath/"prediction_val.csv")
+    # print(f"Prediction saved to: {hydra_logpath/'prediction_val.csv'}")
+
+    
+    
+    res_test = trainer.predict(model=model, dataloaders=melanoma_data_module.test_dataloader())
+    img = [j for i in res_test for j in i[0]]
+    pred = [j for i in res_test for j in i[1]]
+    pd.DataFrame({"image":img,f"{HydraConfig.get().job.name}_pred":pred}).to_csv(hydra_logpath/"prediction_test.csv")
+    print(f"Prediction saved to: {hydra_logpath/'prediction_test.csv'}")
 
     
 if __name__=="__main__":

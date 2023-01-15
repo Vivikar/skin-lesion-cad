@@ -77,6 +77,8 @@ class MelanomaDataset(Dataset):
                 return 1
             elif label == "scc":
                 return 2
+            elif label == 'testX':
+                return 0
             else:
                 raise ValueError("class needs to be bcc, mel or scc")
 
@@ -358,7 +360,7 @@ class MelanomaDataModule(LightningDataModule):
             self.DataSet = MelanomaDataset
             
         self.cfg = cfg
-        if cfg.train:
+        if cfg.train and True:
             self.train_dataset = self.DataSet(
                 cfg.data_dir, split="train", chall=cfg.chall, cfg=cfg)
             self.val_dataset = self.DataSet(

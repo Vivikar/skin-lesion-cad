@@ -1,8 +1,8 @@
 defaults:
   - _self_
   - data: skin
-  - model: swin
-  # - model: regNet / swin
+  - model: swinregnet
+  # - model: regNet / swin /swinregnet
 pl_trainer:   
   # max_epochs: 100
   # devices: [0]
@@ -10,9 +10,9 @@ pl_trainer:
 
 hydra:
   job:
-    name: swin_v2_t_100ep_full_augm
+    name: ens_freeze_tuned2class_pretext
     # regnety32gf_ch2_pretrained
     # swinv2t_ch2_pretrained
   run:
     dir: outputs/${hydra.job.name}
-checkpoint_path: lightning_logs/version_1/checkpoints/epoch=27-valid_acc=0.9239.ckpt
+checkpoint_path: /home/user0/cad_vlanasi/skin-lesion-cad/outputs/ens_freeze_tuned2class_pretext/lightning_logs/version_1/checkpoints/epoch=05-valid_acc=0.9360.ckpt

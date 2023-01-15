@@ -149,3 +149,10 @@ class ConvTransformerEnsemble(pl.LightningModule):
         # for out in training_step_outputs:
         if self.loss == 'mwn':
             self.criterion.reset_epoch(self.current_epoch)
+    
+    def predict_step(self, batch, batch_idx):
+        x = batch['image']
+        names = batch['name']
+        batch_size = len(names)
+        y_hat =  [i.argmax().item() for i in self.forward(x)]
+        return names,y_hat

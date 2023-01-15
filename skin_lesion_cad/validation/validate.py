@@ -23,3 +23,6 @@ def validate2csv(hydra_logpath: Path,
     res_train = [{k.replace('val', 'train'):v for k,v in i.items()} for i in res_train]
     res_csv = pd.DataFrame(res_val + res_train)
     res_csv.to_csv(hydra_logpath / "results.csv")
+    
+if __name__ == '__main__':
+    
