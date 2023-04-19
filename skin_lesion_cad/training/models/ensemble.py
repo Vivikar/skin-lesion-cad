@@ -34,25 +34,18 @@ class ConvTransformerEnsemble(pl.LightningModule):
         self.regnet = RegNetY.load_from_checkpoint(regnet_chkp_path)
         self.swin = SwinModel.load_from_checkpoint(swin_chkp_path)
         
-
-        
         if self.freeze_backbones:
             self.regnet.freeze()
             self.swin.freeze()
         
-        # create classifier and merge in it the feature encodings
+        # set-up the feature fusion layer for ensembling
         regnet_enc_dim = self.regnet.model.fc.in_features
         swin_enc_dim = self.swin.model.head.in_features
         in_features = regnet_enc_dim + swin_enc_dim
-
-        
-        # self.classifier = torch.nn.Sequential(torch.nn.Linear(in_features, 512),
-        #                                       torch.nn.Softmax(),
-        #                                       #torch.nn.Dropout(0.2),
-        #                                       torch.nn.Linear(512, num_classes))
         self.classifier = torch.nn.Linear(in_features, num_classes)
 
-        # remove last softmax output layer and replace with Identity
+        # remove last softmax output layer and replace with Identity for
+        # ensebmle models to merge the bottleneck features
         self.regnet.model.fc = torch.nn.Identity()
         self.swin.model.head = torch.nn.Identity()
 
@@ -66,9 +59,7 @@ class ConvTransformerEnsemble(pl.LightningModule):
             self.train_kappa = torchmetrics.CohenKappa(num_classes=self.num_classes)
             self.valid_kappa = torchmetrics.CohenKappa(num_classes=self.num_classes)
 
-
         self.save_hyperparameters()
-
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate)
@@ -81,14 +72,12 @@ class ConvTransformerEnsemble(pl.LightningModule):
                 "lr_scheduler": {"scheduler": sch,
                                  "monitor":"val_loss"}}
 
-
     def forward(self, x):
         regnet_enc = self.regnet(x) # 64x3
         swin_enc = self.swin(x) 
         x = torch.cat((regnet_enc, swin_enc), dim=1)
         x = self.classifier(x)
         return x
-    
     
     def training_step(self, batch, batch_idx):
         x = batch['image']
@@ -97,6 +86,7 @@ class ConvTransformerEnsemble(pl.LightningModule):
         y_hat = self.forward(x) # notice we change .model to .forward
         
         loss = self.criterion(y_hat, y)
+        
         # need to manually average loss per batch
         if self.loss == 'focal':
             loss = loss.mean()
